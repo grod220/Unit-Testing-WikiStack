@@ -39,7 +39,6 @@ router.post('/', function (req, res, next) {
 });
 
 router.get('/search', function (req, res, next) {
-
     Page.findByTag(req.query.search)
         .then(function (pages) {
             res.render('index', {
