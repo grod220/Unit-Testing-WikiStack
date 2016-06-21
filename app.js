@@ -1,46 +1,31 @@
-'use strict';
 var express = require('express');
 var app = express();
-var morgan = require('morgan');
-var swig = require('swig');
-var makesRouter = require('./routes');
-var fs = require('fs');
-var path = require('path');
-var mime = require('mime');
-var bodyParser = require('body-parser');
-var socketio = require('socket.io');
 
-// templating boilerplate setup
-app.engine('html', swig.renderFile); // how to render html templates
-app.set('view engine', 'html'); // what file extension do our templates have
-app.set('views', path.join(__dirname, '/views')); // where to find the views
+var morgan = require('morgan');
+var bodyParser = require('body-parser');
+
+var swig = require('swig');
+var path = require('path');
+module.exports = app;
+
+app.set('views', path.join(__dirname, './views'));
+app.set('view engine', 'html');
+app.engine('html', swig.renderFile);
 swig.setDefaults({ cache: false });
 
-// logging middleware
 app.use(morgan('dev'));
+app.use(express.static(path.join(__dirname, './public')));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-// body parsing middleware
-app.use(bodyParser.urlencoded({ extended: true })); // for HTML form submits
-app.use(bodyParser.json()); // would be for AJAX requests
+app.use('/wiki', require('./routes/wiki'));
+app.use('/users', require('./routes/users'));
 
-
-// start the server
-var server = app.listen(1337, function(){
-  console.log('listening on port 1337');
+app.get('/', function (req, res) {
+   res.render('index');
 });
-var io = socketio.listen(server);
 
-app.use(express.static(path.join(__dirname, '/public')));
-
-// modular routing that uses io inside it
-app.use('/', makesRouter(io));
-
-// // manually-written static file middleware
-// app.use(function(req, res, next){
-//   var mimeType = mime.lookup(req.path);
-//   fs.readFile('./public' + req.path, function(err, fileBuffer){
-//     if (err) return next();
-//     res.header('Content-Type', mimeType);
-//     res.send(fileBuffer);
-//   });
-// });
+app.use(function (err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).send(err.message);
+});
