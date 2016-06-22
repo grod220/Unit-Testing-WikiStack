@@ -107,6 +107,40 @@ describe('Page Model', function () {
   });
 });
 
+describe('similar tags', function() {
+  var page1 = Page.create({
+    title: "base page",
+    content: "we will test this page's functions",
+    tags: ['test' , 'trial']
+  });
+  var page2 = Page.create({
+    title : "one shared tag",
+    content: "this page has a shared tag with page 1",
+    tags : ['trial', 'notSharing']
+  });
+
+  var page3 = Page.create({
+    title : "no shared tags",
+    content: "this page should never be called",
+    tags : ['something', 'irrelevant']
+  });
+
+    it('successfully finds similar pages with same tags', function (done) {
+      Promise.all([page1,page2,page3]).then(function (pages){
+        return pages[0].findSimilar();
+      }).then(function(result){
+          expect(result).to.have.lengthOf(1);
+          expect(result[0]).to.equal(page2);
+          expect(result).to.not.include(page1);
+          expect(result).to.not.include(page3);
+        });
+          done();
+      });
+
+
+
+});
+
   describe('Validations', function (done) {
     var page;
     beforeEach(function () {

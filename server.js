@@ -6,8 +6,8 @@ var Promise = require('bluebird');
 server.on('request', require('./app'));
 
 Promise.all([
-        models.User.sync({}),
-        models.Page.sync({})
+        models.User.sync({force: true}),
+        models.Page.sync({force: true})
     ])
     .then(function () {
         server.listen(3001, function () {

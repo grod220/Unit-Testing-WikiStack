@@ -28,7 +28,7 @@ describe('http requests', function () {
     });
     it('responds with 200 on page that does exist', function(done) {
       agent
-      .get('/wiki/Whats_up')
+      .get('/wiki/base_page')
       .expect(200, done);
     });
   });
@@ -49,7 +49,7 @@ describe('http requests', function () {
     });
     it('responds with 200 for similar page', function (done) {
       agent
-      .get('/wiki/foo/similar')
+      .get('/wiki/base_page/similar')
       .expect(200, done);
     });
   });
